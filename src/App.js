@@ -1,30 +1,28 @@
 import React, {Component} from 'react';
 import MemberList from './lol_uniq/view/MemberList';
-import axios from 'axios';
 
 class App extends Component {
   state = {
     members: [
       {
-        nickname: 'abc',
+        nickname: 'UniqRJungler',
         tier: 'Challenger',
         position: 'Jungle',
-        userNumber: '0'
+        userNumber: '0',
+        summoner: '',
+        match: ''
       },
       {
-        nickname: 'efg',
+        nickname: 'UniqRNoChat',
         tier: 'Iron',
         position: 'Support',
-        userNumber: '1'
+        userNumber: '1',
+        summoner: '',
+        match: '',
       }
     ],
     searchKeyword: '',
     selectedMembers: []
-  }
-
-  ApiInfo = {
-    url : "https://kr.api.riotgames.com/lol",
-    key : "RGAPI-7873ccd3-a7bd-4da3-97b5-468a4757cfa4"
   }
 
   handleChange = (e) => {
@@ -44,28 +42,34 @@ class App extends Component {
     })
   }
 
-  getUserData = () => {
-    let userUrl, matchUrl, leagueUrl;
-  
-    userUrl = `${this.ApiInfo.url}/summoner/v3/summoners/by-name/${this.state.searchKeyword}?api_key=${this.ApiInfo.key}`; 
-  }
-
-  handleClick = (userNumber) => {
-    console.log('handleClick')
+  handleClick = (userNumber, listType) => {
+    console.log('handleClick listType = ' + listType)
 
     const {members, selectedMembers} = this.state
 
-    this.setState({
-      selectedMembers: selectedMembers.concat(
-        members.filter(
-          memberInfo => memberInfo.userNumber === userNumber
-        )
-      ),
+    listType === '0' ?
+      this.setState({
+        selectedMembers: selectedMembers.concat(
+          members.filter(
+            memberInfo => memberInfo.userNumber === userNumber
+          )
+        ),
 
-      members: members.filter(
-        memberInfo => memberInfo.userNumber !== userNumber
-      )
-    })
+        members: members.filter(
+          memberInfo => memberInfo.userNumber !== userNumber
+        )
+      })
+      : this.setState({
+        members: members.concat(
+          selectedMembers.filter(
+            memberInfo => memberInfo.userNumber === userNumber
+          )
+        ),
+  
+        selectedMembers: selectedMembers.filter(
+          memberInfo => memberInfo.userNumber !== userNumber
+        )
+      })
   } 
 
   render() {
@@ -76,13 +80,15 @@ class App extends Component {
       tier: '',
       position: '',
       userNumber: '0',
+      listType: '0'
     }]
 
     let defaultSelectedMemberInfo = [{
-      nickname: '내전 멤버를 선택해주세요',
+      nickname: '',
       tier: '',
       position: '',
       userNumber: '0',
+      listType: '1'
     }]
 
     //lowercase, blank 제거
@@ -95,8 +101,6 @@ class App extends Component {
       memberInfo =>
         filteredList[members.indexOf(memberInfo)].indexOf(searchKeyword.toLowerCase().replace(/\s/g, "")) !== -1
     )
-
-    this.getUserData();
 
     return (
       <div>
@@ -113,6 +117,7 @@ class App extends Component {
           members = {resultList.length === 0 ? defaultMemberInfo : resultList}
           onUpdate = {() => this.handleUpdate()}
           onClick = {this.handleClick}
+          listType = '0'
         />
 
         <h2>참여 명단</h2>
@@ -120,6 +125,7 @@ class App extends Component {
           members = {selectedMembers.length === 0 ? defaultSelectedMemberInfo : selectedMembers}
           onUpdate = {() => this.handleUpdate()}
           onClick = {this.handleClick}
+          listType = '1'
         />
       </div>
     );

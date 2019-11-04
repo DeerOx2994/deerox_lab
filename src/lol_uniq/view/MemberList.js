@@ -4,16 +4,19 @@ import MemberInfo from '../dto/MemberInfo'
 class MemberList extends Component {
     static defaultProps ={
         members: [],
+        listType: '0' // 0 : 대기 명단, 1 : 참여 명단
     }
 
     render() {
-        const { members, onClick } = this.props;
+        const { members, onClick, listType } = this.props;
+
         const list = members.map(
             memberInfo => (
                 <MemberInfo
                     key = {memberInfo.userNumber}
                     memberInfo = {memberInfo}
                     onClick = {onClick}
+                    listType = {listType}
                 />
             )
         );
