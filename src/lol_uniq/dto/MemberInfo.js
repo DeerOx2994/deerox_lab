@@ -10,31 +10,24 @@ class MemberInfo extends Component{
             position: '',
             userNumber: '',
             summoner: '',
-            match: ''
-        },
+            match: ''   
+        }
    }
 
-   ApiInfo = {
-    key : "RGAPI-87666eee-0ab1-48bd-a5fb-9e4d1f1ffdcf"
-  }
+    getUserData = async function(instance, nickname, key) {
+        if(nickname !== '') {
+            console.log('getUserData')
 
-   getUserData = (nickname) => {
-       if(nickname !== '') {
-        console.log('getUserData')
-        let userUrl, matchUrl;
-        
-        userUrl = `/lol/summoner/v4/summoners/by-name/${nickname}?api_key=${this.ApiInfo.key}`;
-        axios.get(userUrl).then(summonerData => {
-            matchUrl = `/lol/match/v4/matchlists/by-account/${summonerData.data.accountId}?api_key=${this.ApiInfo.key}`;
-            axios.get(matchUrl).then(matchData => {
-                this.setState({
-                    summoner: summonerData.data,
-                    match: matchData.data,
-                })
-            }).catch(error => console.log('Riot API error 1'));
-        }).catch(error => console.log('Riot API error 0'));
-    }
-  }
+            try {
+                const summonerData = await instance.get(`/summoner/v4/summoners/by-name/${nickname}?api_key=${key}`);
+                const matchData = await instance.get(`/match/v4/matchlists/by-account/${summonerData.data.accountId}?api_key=${key}`);
+                this.props.memberInfo.summoner = summonerData.data;
+                this.props.memberInfo.match = matchData.data;
+            } catch (error) {
+                console.error(error)
+            }
+        }
+   }
 
    render() {
        const style = {
@@ -51,8 +44,15 @@ class MemberInfo extends Component{
        const {onClick} = this.props;
 
        if(listType === '1') {
-           this.getUserData(nickname);
-       }
+            const ApiInfo = {
+                url : "/lol",
+                key : "RGAPI-87666eee-0ab1-48bd-a5fb-9e4d1f1ffdcf"
+            }
+            ApiInfo.instance = axios.create({ baseURL : ApiInfo.url });
+
+            this.getUserData(ApiInfo.instance, nickname, ApiInfo.key);
+        }
+       
 
        return(
             <div
