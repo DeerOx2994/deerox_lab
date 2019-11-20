@@ -1,11 +1,9 @@
 import React from 'react';
 
 class TierInfo{
-    static defaultProps = {
-        tierName : '',
-        tierPoint : 0,
-        weight : 0
-    }
+    tierName;
+    tierPoint;
+    weight;
 }
 
 export default TierInfo;

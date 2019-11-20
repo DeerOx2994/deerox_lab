@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import MemberList from './lol_uniq/view/MemberList';
 import DefaultMember from './lol_uniq/data/DefaultMember';
+import TierGrade from './lol_uniq/data/TierGrade';
+import TierInfo from './lol_uniq/dto/TierInfo';
 
 class App extends Component {
   key = '10'
@@ -74,9 +76,27 @@ class App extends Component {
 
   mixMember = () => {
     console.log('mixMember')
-
     //1. 각 팀당 임의의 2명을 할당
     // leftTeamMembers.concat
+
+    
+  }
+
+  getPoint = (tierName) => {
+    console.log('getPoint : ' + tierName);
+    const str = tierName.split(' ');
+    const tier = TierGrade.find(function (e){
+      return e.tierName === str[0];
+    });
+    const number = str[1] === 'I'
+      ? 0
+      : str[1] ==='II'
+        ? 1
+        : str [2] === 'III'
+          ? 2
+          : 3
+
+    return tier.tierPoint + tier.weight * number;
   }
 
   render() {
@@ -136,7 +156,7 @@ class App extends Component {
           listType = '1'
         />
 
-        <button>팀 매칭</button>
+        <button onClick = {this.mixMember}>팀 매칭</button>
         
         <MemberList
           listType = '1'
