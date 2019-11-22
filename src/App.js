@@ -96,12 +96,15 @@ class App extends Component {
   }
 
   getAveragePoint = (team) => {
-    let point, index = 0;
+    let point = 0;
+    let index;
     for(index = 0; index < team.length; index++) {
         point += this.getPoint(team[index].tier);
-        console.log(Number(point))
+        console.log(`point : ${point}`)
     }
-    return point/team.count;
+    console.log(`team.count : ${team.count}`)
+    console.log(`team.count is NaN ? ${isNaN(team.count)}`)
+    return point/(team.length);
   }
   
   addRandomMember = (selectedMembers, team) => {
@@ -142,11 +145,8 @@ class App extends Component {
           ? 2
           : 3
 
-    console.log(tier.tierPoint * 1);
-    console.log(tier.weight * 1);
-    console.log(number * 1)
-    console.log(tier.weight * number * 1);
-    return (tier.tierPoint + (tier.weight * number));
+    console.log(`getPoint return : ${1 * tier.tierPoint + tier.weight * number}`)
+    return 1 * tier.tierPoint + tier.weight * number;
   }
 
   render() {
