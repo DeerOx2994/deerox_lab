@@ -11,8 +11,10 @@ class App extends Component {
     searchKeyword: '',
     selectedMembers: [],
     leftTeamMembers: [],
-    rightTeamMembers: []
+    rightTeamMembers: [],
   }
+  selectedIndexs = [false, false, false, false, false,
+                    false, false, false, false, false];
 
   handleChange = (e) => {
     this.setState({
@@ -76,10 +78,54 @@ class App extends Component {
 
   mixMember = () => {
     console.log('mixMember')
-    //1. 각 팀당 임의의 2명을 할당
-    // leftTeamMembers.concat
+    let {selectedMembers, leftTeamMembers, rightTeamMembers} = this.state;
 
+    if(selectedMembers.length !== 10) {
+      return
+    }
+  
+    //1. 각 팀당 임의의 2명을 할당
+    leftTeamMembers = this.addRandomMember(selectedMembers, leftTeamMembers);
+    leftTeamMembers = this.addRandomMember(selectedMembers, leftTeamMembers);
+    rightTeamMembers = this.addRandomMember(selectedMembers, rightTeamMembers);
+    rightTeamMembers = this.addRandomMember(selectedMembers, rightTeamMembers);
+
+    //2. 각 팀의 평균 점수를 비교
+    console.log(this.getAveragePoint(leftTeamMembers))
+
+  }
+
+  getAveragePoint = (team) => {
+    let point, index = 0;
+    for(index = 0; index < team.length; index++) {
+        point += this.getPoint(team[index].tier);
+        console.log(Number(point))
+    }
+    return point/team.count;
+  }
+  
+  addRandomMember = (selectedMembers, team) => {
+    const min = Math.ceil(0);
+    let max = Math.floor(10);
+    let randomIndex = Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
     
+    let count = 0;
+    while(count < 10){
+      if(this.selectedIndexs[randomIndex] === false) {
+        team = team.concat(
+          selectedMembers[randomIndex]
+        );
+        
+        this.selectedIndexs = [
+            ...this.selectedIndexs.slice(0, randomIndex),
+            true,
+            ...this.selectedIndexs.slice(randomIndex + 1)
+        ]
+        break;
+      }
+      count++;
+    }
+    return team;
   }
 
   getPoint = (tierName) => {
@@ -90,13 +136,17 @@ class App extends Component {
     });
     const number = str[1] === 'I'
       ? 0
-      : str[1] ==='II'
+      : str[1] === 'II'
         ? 1
-        : str [2] === 'III'
+        : str[1] === 'III'
           ? 2
           : 3
 
-    return tier.tierPoint + tier.weight * number;
+    console.log(tier.tierPoint * 1);
+    console.log(tier.weight * 1);
+    console.log(number * 1)
+    console.log(tier.weight * number * 1);
+    return (tier.tierPoint + (tier.weight * number));
   }
 
   render() {

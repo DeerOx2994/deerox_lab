@@ -10,7 +10,8 @@ class MemberInfo extends Component{
             position: '',
             userNumber: '',
             summoner: '',
-            match: ''   
+            match: '',
+            isSelected: 'false' 
         }
    }
    state = {

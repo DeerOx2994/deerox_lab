@@ -59,7 +59,7 @@ class DefaultMember {
         match: ''
       },
       {
-        nickname: 'Uniq R Corona',
+        nickname: 'Uniq R 길동',
         tier: '',
         position: '',
         userNumber: '7',
