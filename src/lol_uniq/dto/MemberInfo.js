@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import TierGrade from '../data/TierGrade';
 
 class MemberInfo extends Component {
   static defaultProps = {
@@ -12,6 +13,7 @@ class MemberInfo extends Component {
       summoner: '',
       match: '',
       isSelected: 'false',
+      point: '0',
     },
   };
   state = {
@@ -48,6 +50,8 @@ class MemberInfo extends Component {
                 return e.queueType === 'RANKED_SOLO_5x5';
               }).rank;
 
+        this.props.memberInfo.point = this.getPoint(this.props.memberInfo.tier);
+
         this.setState({
           isUpdated: true,
         });
@@ -56,6 +60,17 @@ class MemberInfo extends Component {
         console.error(error);
       }
     }
+  };
+
+  getPoint = tierName => {
+    console.log('getPoint : ' + tierName);
+    const str = tierName.split(' ');
+    const tier = TierGrade.find(function(e) {
+      return e.tierName === str[0];
+    });
+    const number =
+      str[1] === 'I' ? 0 : str[1] === 'II' ? 1 : str[1] === 'III' ? 2 : 3;
+    return 1 * tier.tierPoint + tier.weight * number;
   };
 
   render() {

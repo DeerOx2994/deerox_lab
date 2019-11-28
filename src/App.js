@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import MemberList from './lol_uniq/view/MemberList';
 import DefaultMember from './lol_uniq/data/DefaultMember';
-import TierGrade from './lol_uniq/data/TierGrade';
-import TierInfo from './lol_uniq/dto/TierInfo';
 
 class App extends Component {
   key = '10';
@@ -92,38 +90,84 @@ class App extends Component {
       return;
     }
 
-    //1. 각 팀당 임의의 2명을 할당
+    //1. 선택된 멤버들을 가중치별로 정렬
+    selectedMembers = this.quickSort(selectedMembers);
+
+    //2. 각 팀당 임의의 2명을 할당
     leftTeamMembers = this.addRandomMember(selectedMembers, leftTeamMembers);
     leftTeamMembers = this.addRandomMember(selectedMembers, leftTeamMembers);
     rightTeamMembers = this.addRandomMember(selectedMembers, rightTeamMembers);
     rightTeamMembers = this.addRandomMember(selectedMembers, rightTeamMembers);
 
-    // 2. 각 팀의 평균 점수를 비교
+    // 3. 각 팀의 평균 점수를 비교하여 낮은 팀이 가장 높은 점수의 대기 선수를 가져간다.
+    this.distributeMember(selectedMembers, leftTeamMembers, rightTeamMembers);
+  };
+
+  distributeMember = (members, leftTeamMembers, rightTeamMembers) => {
+    console.log('distributeMember()');
+
+    if (leftTeamMembers.length >= 5 && rightTeamMembers.length >= 5) {
+      this.setState({
+        selectedMembers: members,
+        leftTeamMembers: leftTeamMembers,
+        rightTeamMembers: rightTeamMembers,
+      });
+      return;
+    }
+    let highIndex = members.length - 1;
+    for (let i = highIndex; i >= 0; i--) {
+      console.log('index = ' + i + ' / ' + this.selectedIndexs[i]);
+
+      if (!this.selectedIndexs[i]) {
+        this.selectedIndexs[i] = true;
+        highIndex = i;
+        break;
+      }
+    }
+
+    let lowIndex = highIndex - 1;
+
+    for (let i = highIndex - 1; i >= 0; i--) {
+      console.log('index = ' + i + ' / ' + this.selectedIndexs[i]);
+
+      if (!this.selectedIndexs[i]) {
+        this.selectedIndexs[i] = true;
+        lowIndex = i;
+        break;
+      }
+    }
+
     if (
       this.getAveragePoint(leftTeamMembers) <=
       this.getAveragePoint(rightTeamMembers)
     ) {
+      leftTeamMembers = leftTeamMembers.concat(members[highIndex]);
+      rightTeamMembers = rightTeamMembers.concat(members[lowIndex]);
     } else {
+      rightTeamMembers = rightTeamMembers.concat(members[highIndex]);
+      leftTeamMembers = leftTeamMembers.concat(members[lowIndex]);
     }
+
+    this.distributeMember(members, leftTeamMembers, rightTeamMembers);
   };
 
   getAveragePoint = team => {
     let point = 0;
     let index;
     for (index = 0; index < team.length; index++) {
-      point += this.getPoint(team[index].tier);
+      point += team[index].point;
     }
-    // console.log(`team.count is NaN ? ${isNaN(team.count)}`)
     return point / team.length;
   };
 
   addRandomMember = (selectedMembers, team) => {
     const min = Math.ceil(0);
     let max = Math.floor(10);
-    let randomIndex = Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
-
     let count = 0;
+
     while (count < 10) {
+      let randomIndex = Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
+
       if (this.selectedIndexs[randomIndex] === false) {
         team = team.concat(selectedMembers[randomIndex]);
 
@@ -136,22 +180,64 @@ class App extends Component {
       }
       count++;
     }
+
     return team;
   };
 
-  getPoint = tierName => {
-    console.log('getPoint : ' + tierName);
-    const str = tierName.split(' ');
-    const tier = TierGrade.find(function(e) {
-      return e.tierName === str[0];
-    });
-    const number =
-      str[1] === 'I' ? 0 : str[1] === 'II' ? 1 : str[1] === 'III' ? 2 : 3;
-    return 1 * tier.tierPoint + tier.weight * number;
+  /**
+   * @see https://gmlwjd9405.github.io/2018/05/10/algorithm-quick-sort.html
+   */
+  quickSort = memberInfo => {
+    if (memberInfo.length < 2) return memberInfo;
+
+    const pivot = memberInfo[0].point;
+
+    let leftCursor = 1;
+    let rightCursor = memberInfo.length - 1;
+    while (leftCursor <= rightCursor) {
+      // 왼쪽수가 기준보다 크고 오른쪽 수가 기준보다 작으면 위치를 바꿉니다 (swap)
+      if (
+        memberInfo[leftCursor].point > pivot &&
+        memberInfo[rightCursor].point < pivot
+      ) {
+        [memberInfo[leftCursor], memberInfo[rightCursor]] = [
+          memberInfo[rightCursor],
+          memberInfo[leftCursor],
+        ];
+        leftCursor++;
+        rightCursor--;
+      }
+
+      // 왼쪽 수는 기준보다 작으면 다음으로 넘어가고, 크면 가만히 있습니다
+      if (memberInfo[leftCursor].point <= pivot) {
+        leftCursor++;
+      }
+
+      // 오른쪽 수는 기준보다 크면 다음으로 넘어가고, 작으면 가만히
+      if (memberInfo[rightCursor].point >= pivot) {
+        rightCursor--;
+      }
+    }
+
+    [memberInfo[0], memberInfo[leftCursor - 1]] = [
+      memberInfo[leftCursor - 1],
+      memberInfo[0],
+    ];
+    const left = memberInfo.splice(0, leftCursor - 1);
+    const mid = memberInfo.splice(0, 1);
+    const right = memberInfo;
+
+    return [...this.quickSort(left), ...mid, ...this.quickSort(right)];
   };
 
   render() {
-    const { members, selectedMembers, searchKeyword } = this.state;
+    const {
+      members,
+      selectedMembers,
+      searchKeyword,
+      leftTeamMembers,
+      rightTeamMembers,
+    } = this.state;
 
     let defaultMemberInfo = [
       {
@@ -219,9 +305,11 @@ class App extends Component {
 
         <button onClick={this.mixMember}>팀 매칭</button>
 
-        <MemberList listType="1" />
+        <h2>왼쪽 팀</h2>
+        <MemberList listType="2" members={leftTeamMembers} />
 
-        <MemberList listType="1" />
+        <h2>오른쪽 팀</h2>
+        <MemberList listType="2" members={rightTeamMembers} />
       </div>
     );
   }
