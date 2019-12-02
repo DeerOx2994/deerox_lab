@@ -9,7 +9,7 @@ class MemberInfo extends Component {
       nickname: '',
       tier: '',
       position: '',
-      userNumber: '',
+      key: '',
       summoner: '',
       match: '',
       isSelected: 'false',
@@ -22,7 +22,6 @@ class MemberInfo extends Component {
 
   getUserData = async function(instance, nickname, key) {
     if (nickname !== undefined && nickname !== '') {
-      console.log('getUserData ' + nickname);
       try {
         const summonerData = await instance.get(
           `/summoner/v4/summoners/by-name/${nickname}?api_key=${key}`,
@@ -63,7 +62,6 @@ class MemberInfo extends Component {
   };
 
   getPoint = tierName => {
-    console.log('getPoint : ' + tierName);
     const str = tierName.split(' ');
     const tier = TierGrade.find(function(e) {
       return e.tierName === str[0];
@@ -80,13 +78,7 @@ class MemberInfo extends Component {
       margin: '8px',
     };
 
-    const {
-      tier,
-      position,
-      userNumber,
-      summoner,
-      match,
-    } = this.props.memberInfo;
+    const { tier, position, key, summoner, match } = this.props.memberInfo;
 
     const { listType } = this.props;
     const { onClick } = this.props;
@@ -108,7 +100,7 @@ class MemberInfo extends Component {
     const { nickname } = this.props.memberInfo;
 
     return (
-      <div style={style} onClick={() => onClick(userNumber, listType)}>
+      <div style={style} onClick={() => onClick(key, listType)}>
         <div>
           <b>
             {listType === '1' && nickname === ''

@@ -10,6 +10,8 @@ class App extends Component {
     selectedMembers: [],
     leftTeamMembers: [],
     rightTeamMembers: [],
+    leftTeamPoint: '',
+    rightTeamPoint: '',
   };
   selectedIndexs = [
     false,
@@ -30,18 +32,16 @@ class App extends Component {
     });
   };
 
-  handleUpdate = (userNumber, data) => {
+  handleUpdate = (key, data) => {
     const { members } = this.state;
     this.setState({
       members: members.map(memberInfo =>
-        userNumber === memberInfo.userNumber
-          ? { ...memberInfo, ...data }
-          : memberInfo,
+        key === memberInfo.key ? { ...memberInfo, ...data } : memberInfo,
       ),
     });
   };
 
-  handleUserInfoClick = (userNumber, listType) => {
+  handleUserInfoClick = (key, listType) => {
     console.log('handleUserInfoClick listType = ' + listType);
 
     const { members, selectedMembers } = this.state;
@@ -49,22 +49,18 @@ class App extends Component {
     listType === '0'
       ? this.setState({
           selectedMembers: selectedMembers.concat(
-            members.filter(memberInfo => memberInfo.userNumber === userNumber),
+            members.filter(memberInfo => memberInfo.key === key),
           ),
 
-          members: members.filter(
-            memberInfo => memberInfo.userNumber !== userNumber,
-          ),
+          members: members.filter(memberInfo => memberInfo.key !== key),
         })
       : this.setState({
           members: members.concat(
-            selectedMembers.filter(
-              memberInfo => memberInfo.userNumber === userNumber,
-            ),
+            selectedMembers.filter(memberInfo => memberInfo.key === key),
           ),
 
           selectedMembers: selectedMembers.filter(
-            memberInfo => memberInfo.userNumber !== userNumber,
+            memberInfo => memberInfo.key !== key,
           ),
         });
   };
@@ -77,18 +73,21 @@ class App extends Component {
     this.setState({
       members: members.concat({
         nickname: nickname,
-        userNumber: this.key++,
+        key: this.key++,
       }),
     });
   };
 
   mixMember = () => {
     console.log('mixMember');
-    let { selectedMembers, leftTeamMembers, rightTeamMembers } = this.state;
+    let { selectedMembers } = this.state;
 
     if (selectedMembers.length !== 10) {
       return;
     }
+
+    let leftTeamMembers = [];
+    let rightTeamMembers = [];
 
     //1. 선택된 멤버들을 가중치별로 정렬
     selectedMembers = this.quickSort(selectedMembers);
@@ -104,20 +103,26 @@ class App extends Component {
   };
 
   distributeMember = (members, leftTeamMembers, rightTeamMembers) => {
-    console.log('distributeMember()');
-
     if (leftTeamMembers.length >= 5 && rightTeamMembers.length >= 5) {
+      let leftTeamPoint = 0;
+      let rightTeamPoint = 0;
+
+      for (let i = 0; i < 5; i++) {
+        leftTeamPoint += leftTeamMembers[i].point;
+        rightTeamPoint += rightTeamMembers[i].point;
+      }
+
       this.setState({
         selectedMembers: members,
         leftTeamMembers: leftTeamMembers,
         rightTeamMembers: rightTeamMembers,
+        leftTeamPoint: leftTeamPoint / 5,
+        rightTeamPoint: rightTeamPoint / 5,
       });
       return;
     }
     let highIndex = members.length - 1;
     for (let i = highIndex; i >= 0; i--) {
-      console.log('index = ' + i + ' / ' + this.selectedIndexs[i]);
-
       if (!this.selectedIndexs[i]) {
         this.selectedIndexs[i] = true;
         highIndex = i;
@@ -128,8 +133,6 @@ class App extends Component {
     let lowIndex = highIndex - 1;
 
     for (let i = highIndex - 1; i >= 0; i--) {
-      console.log('index = ' + i + ' / ' + this.selectedIndexs[i]);
-
       if (!this.selectedIndexs[i]) {
         this.selectedIndexs[i] = true;
         lowIndex = i;
@@ -237,6 +240,8 @@ class App extends Component {
       searchKeyword,
       leftTeamMembers,
       rightTeamMembers,
+      leftTeamPoint,
+      rightTeamPoint,
     } = this.state;
 
     let defaultMemberInfo = [
@@ -244,7 +249,7 @@ class App extends Component {
         nickname: `${this.state.searchKeyword}은(는) 클랜원 리스트에 없습니다.`,
         tier: '',
         position: '',
-        userNumber: '0',
+        key: '0',
         listType: '0',
       },
     ];
@@ -254,7 +259,7 @@ class App extends Component {
         nickname: '',
         tier: '',
         position: '',
-        userNumber: '0',
+        key: '0',
         listType: '1',
       },
     ];
@@ -290,8 +295,7 @@ class App extends Component {
           onClick={this.handleUserInfoClick}
           listType="0"
         />
-
-        <h2>참여 명단</h2>
+        <h2>참여 명단 {selectedMembers.length}명</h2>
         <MemberList
           members={
             selectedMembers.length === 0
@@ -302,13 +306,12 @@ class App extends Component {
           onClick={this.handleUserInfoClick}
           listType="1"
         />
-
         <button onClick={this.mixMember}>팀 매칭</button>
-
         <h2>왼쪽 팀</h2>
+        {leftTeamPoint !== '' ? <p>{leftTeamPoint}</p> : null}
         <MemberList listType="2" members={leftTeamMembers} />
-
         <h2>오른쪽 팀</h2>
+        {rightTeamPoint !== '' ? <p>{rightTeamPoint}</p> : null}
         <MemberList listType="2" members={rightTeamMembers} />
       </div>
     );

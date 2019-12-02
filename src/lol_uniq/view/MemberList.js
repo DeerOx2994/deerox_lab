@@ -12,7 +12,7 @@ class MemberList extends Component {
 
     const list = members.map(memberInfo => (
       <MemberInfo
-        key={memberInfo.userNumber}
+        key={memberInfo.key}
         memberInfo={memberInfo}
         onClick={onClick}
         listType={listType}
