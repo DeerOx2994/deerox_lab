@@ -16,12 +16,18 @@ class MemberInfo extends Component {
       point: '0',
     },
   };
-  state = {
-    isUpdated: false,
-  };
+
+  isUpdated = false;
 
   getUserData = async function(instance, nickname, key) {
     if (nickname !== undefined && nickname !== '') {
+      console.log(nickname + '/' + this.isUpdated);
+      if (this.isUpdated) {
+        return;
+      }
+
+      this.isUpdated = true;
+
       try {
         const summonerData = await instance.get(
           `/summoner/v4/summoners/by-name/${nickname}?api_key=${key}`,
@@ -51,9 +57,7 @@ class MemberInfo extends Component {
 
         this.props.memberInfo.point = this.getPoint(this.props.memberInfo.tier);
 
-        this.setState({
-          isUpdated: true,
-        });
+        this.setState({});
         console.log(summonerData);
       } catch (error) {
         console.error(error);
@@ -83,7 +87,7 @@ class MemberInfo extends Component {
     const { listType } = this.props;
     const { onClick } = this.props;
 
-    if (listType === '1' && this.state.isUpdated === false) {
+    if (listType === '1' && this.isUpdated === false) {
       const ApiInfo = {
         url: '/lol',
         key: 'RGAPI-87666eee-0ab1-48bd-a5fb-9e4d1f1ffdcf',

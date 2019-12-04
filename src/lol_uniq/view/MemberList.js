@@ -10,7 +10,7 @@ class MemberList extends Component {
   render() {
     const { members, onClick, listType } = this.props;
 
-    const list = members.map(memberInfo => (
+    let list = members.map(memberInfo => (
       <MemberInfo
         key={memberInfo.key}
         memberInfo={memberInfo}
