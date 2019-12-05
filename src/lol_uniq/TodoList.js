@@ -3,4 +3,5 @@
  * DB를 만들어서 티어 정보 저장
  * UI 꾸미기
  * Refactoring 진행
+ * MemberInfo.js의 빈 setState 대체
  */

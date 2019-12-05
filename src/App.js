@@ -13,18 +13,7 @@ class App extends Component {
     leftTeamPoint: '',
     rightTeamPoint: '',
   };
-  selectedIndexs = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
+  selectedIndexs = [];
 
   handleChange = e => {
     this.setState({
@@ -88,6 +77,19 @@ class App extends Component {
 
     let leftTeamMembers = [];
     let rightTeamMembers = [];
+    this.selectedIndexs = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ];
+    let originMembers = selectedMembers.map(memberInfo => memberInfo);
 
     //1. 선택된 멤버들을 가중치별로 정렬
     selectedMembers = this.quickSort(selectedMembers);
@@ -99,10 +101,20 @@ class App extends Component {
     rightTeamMembers = this.addRandomMember(selectedMembers, rightTeamMembers);
 
     // 3. 각 팀의 평균 점수를 비교하여 낮은 팀이 가장 높은 점수의 대기 선수를 가져간다.
-    this.distributeMember(selectedMembers, leftTeamMembers, rightTeamMembers);
+    this.distributeMember(
+      selectedMembers,
+      originMembers,
+      leftTeamMembers,
+      rightTeamMembers,
+    );
   };
 
-  distributeMember = (members, leftTeamMembers, rightTeamMembers) => {
+  distributeMember = (
+    members,
+    originMembers,
+    leftTeamMembers,
+    rightTeamMembers,
+  ) => {
     if (leftTeamMembers.length >= 5 && rightTeamMembers.length >= 5) {
       let leftTeamPoint = 0;
       let rightTeamPoint = 0;
@@ -113,7 +125,7 @@ class App extends Component {
       }
 
       this.setState({
-        selectedMembers: members,
+        selectedMembers: originMembers,
         leftTeamMembers: leftTeamMembers,
         rightTeamMembers: rightTeamMembers,
         leftTeamPoint: leftTeamPoint / 5,
@@ -151,7 +163,12 @@ class App extends Component {
       leftTeamMembers = leftTeamMembers.concat(members[lowIndex]);
     }
 
-    this.distributeMember(members, leftTeamMembers, rightTeamMembers);
+    this.distributeMember(
+      members,
+      originMembers,
+      leftTeamMembers,
+      rightTeamMembers,
+    );
   };
 
   getAveragePoint = team => {
@@ -170,7 +187,6 @@ class App extends Component {
 
     while (count < 10) {
       let randomIndex = Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
-
       if (this.selectedIndexs[randomIndex] === false) {
         team = team.concat(selectedMembers[randomIndex]);
 
