@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/deerox_lab/static/css/main.34de6062.chunk.css",
+    "main.js": "/deerox_lab/static/js/main.f20316d8.chunk.js",
+    "main.js.map": "/deerox_lab/static/js/main.f20316d8.chunk.js.map",
+    "runtime-main.js": "/deerox_lab/static/js/runtime-main.d9bfe1ec.js",
+    "runtime-main.js.map": "/deerox_lab/static/js/runtime-main.d9bfe1ec.js.map",
+    "static/js/2.b2c77bcf.chunk.js": "/deerox_lab/static/js/2.b2c77bcf.chunk.js",
+    "static/js/2.b2c77bcf.chunk.js.map": "/deerox_lab/static/js/2.b2c77bcf.chunk.js.map",
+    "index.html": "/deerox_lab/index.html",
+    "precache-manifest.52a62f0ff5cca98b0272ad377838a6c4.js": "/deerox_lab/precache-manifest.52a62f0ff5cca98b0272ad377838a6c4.js",
+    "service-worker.js": "/deerox_lab/service-worker.js",
+    "static/css/main.34de6062.chunk.css.map": "/deerox_lab/static/css/main.34de6062.chunk.css.map"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.d9bfe1ec.js",
+    "static/js/2.b2c77bcf.chunk.js",
+    "static/css/main.34de6062.chunk.css",
+    "static/js/main.f20316d8.chunk.js"
+  ]
+}
